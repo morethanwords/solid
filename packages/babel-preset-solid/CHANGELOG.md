@@ -1,5 +1,45 @@
 # babel-preset-solid
 
+## 1.8.0
+
+### Minor Changes
+
+- 2c087cbb: update to seroval streaming serializer, change ssr markers
+- 2c087cbb: hydration perf improvement, fix #1849
+
+### Patch Changes
+
+- 2c087cbb: remove attribute quotes in template, batch serialization
+- 2c087cbb: improved serialization/guards, fix #1413, fix #1796 hydration with lazy
+
+## 1.8.0-beta.2
+
+### Minor Changes
+
+- e3a97d28: hydration perf improvement, fix #1849
+
+## 1.8.0-beta.1
+
+### Patch Changes
+
+- f6d511db: remove attribute quotes in template, batch serialization
+
+## 1.8.0-beta.0
+
+### Minor Changes
+
+- d8e0e8e8: update to seroval streaming serializer, change ssr markers
+
+### Patch Changes
+
+- bf09b838: improved serialization/guards, fix #1413, fix #1796 hydration with lazy
+
+## 1.7.12
+
+### Patch Changes
+
+- 10ac07af: update jsx types, iife compiler optimization
+
 ## 1.7.7
 
 ### Patch Changes

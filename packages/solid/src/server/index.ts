@@ -1,4 +1,5 @@
 export {
+  catchError,
   createRoot,
   createSignal,
   createComputed,
@@ -23,6 +24,7 @@ export {
   equalFn,
   requestCallback,
   mapArray,
+  indexArray,
   observable,
   from,
   $PROXY,

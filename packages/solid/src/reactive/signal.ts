@@ -140,6 +140,7 @@ export function createRoot<T>(fn: RootFunction<T>, detachedOwner?: typeof Owner)
   const listener = Listener,
     owner = Owner,
     unowned = fn.length === 0,
+    current = detachedOwner === undefined ? owner : detachedOwner,
     root: Owner = unowned
       ? "_SOLID_DEV_"
         ? { owned: null, cleanups: null, context: null, owner: null }
@@ -147,8 +148,8 @@ export function createRoot<T>(fn: RootFunction<T>, detachedOwner?: typeof Owner)
       : {
           owned: null,
           cleanups: null,
-          context: null,
-          owner: detachedOwner === undefined ? owner : detachedOwner
+          context: current ? current.context : null,
+          owner: current
         },
     updateFn = unowned
       ? "_SOLID_DEV_"
@@ -347,7 +348,7 @@ export function createEffect<Next, Init>(
 ): void {
   runEffects = runUserEffects;
   const c = createComputation(fn, value!, false, STALE, "_SOLID_DEV_" ? options : undefined),
-    s = SuspenseContext && lookup(Owner, SuspenseContext.id);
+    s = SuspenseContext && useContext(SuspenseContext);
   if (s) c.suspense = s;
   if (!options || !options.render) c.user = true;
   Effects ? Effects.push(c) : updateComputation(c);
@@ -378,7 +379,7 @@ export function createReaction(onInvalidate: () => void, options?: EffectOptions
       0,
       "_SOLID_DEV_" ? options : undefined
     ),
-    s = SuspenseContext && lookup(Owner, SuspenseContext.id);
+    s = SuspenseContext && useContext(SuspenseContext);
   if (s) c.suspense = s;
   c.user = true;
   return (tracking: () => void) => {
@@ -528,6 +529,10 @@ export type InitializedResourceReturn<T, R = unknown> = [
   ResourceActions<T, R>
 ];
 
+function isPromise(v: any): v is Promise<any> {
+  return v && typeof v === "object" && "then" in v;
+}
+
 /**
  * Creates a resource that wraps a repeated promise in a reactive pattern:
  * ```typescript
@@ -615,7 +620,8 @@ export function createResource<T, S, R>(
     id = `${sharedConfig.context.id}${sharedConfig.context.count++}`;
     let v;
     if (options.ssrLoadFrom === "initial") initP = options.initialValue as T;
-    else if (sharedConfig.load && (v = sharedConfig.load(id))) initP = v[0];
+    else if (sharedConfig.load && (v = sharedConfig.load(id)))
+      initP = isPromise(v) && "value" in v ? v.value : v;
   }
   function loadEnd(p: Promise<T> | null, v: T | undefined, error?: any, key?: S) {
     if (pr === p) {
@@ -646,7 +652,7 @@ export function createResource<T, S, R>(
   }
 
   function read() {
-    const c = SuspenseContext && lookup(Owner, SuspenseContext.id),
+    const c = SuspenseContext && useContext(SuspenseContext),
       v = value(),
       err = error();
     if (err !== undefined && !pr) throw err;
@@ -656,7 +662,7 @@ export function createResource<T, S, R>(
         if (pr) {
           if (c.resolved && Transition && loadedUnderTransition) Transition.promises.add(pr);
           else if (!contexts.has(c)) {
-            c.increment();
+            c.increment!();
             contexts.add(c);
           }
         }
@@ -683,7 +689,7 @@ export function createResource<T, S, R>(
               refetching
             })
           );
-    if (typeof p !== "object" || !(p && "then" in p)) {
+    if (!isPromise(p)) {
       loadEnd(pr, p, undefined, lookup);
       return p;
     }
@@ -755,10 +761,15 @@ export function createDeferred<T>(source: Accessor<T>, options?: DeferredOptions
     },
     undefined,
     true
+  ) as Memo<any>;
+  const [deferred, setDeferred] = createSignal(
+    Transition && Transition.running && Transition.sources.has(node) ? node.tValue : node.value,
+    options
   );
-  const [deferred, setDeferred] = createSignal(node.value as T, options);
   updateComputation(node);
-  setDeferred(() => node.value as T);
+  setDeferred(() =>
+    Transition && Transition.running && Transition.sources.has(node) ? node.tValue : node.value
+  );
   return deferred;
 }
 
@@ -916,7 +927,7 @@ export function on<S, Next extends Prev, Prev = Next>(
 export function on<S, Next extends Prev, Prev = Next>(
   deps: AccessorArray<S> | Accessor<S>,
   fn: OnEffectFunction<S, undefined | NoInfer<Prev>, Next>,
-  options: OnOptions & { defer: true }
+  options: OnOptions | { defer: true }
 ): EffectFunction<undefined | NoInfer<Next>>;
 export function on<S, Next extends Prev, Prev = Next>(
   deps: AccessorArray<S> | Accessor<S>,
@@ -981,7 +992,7 @@ export function onCleanup<T extends () => any>(fn: T): T {
 export function catchError<T>(fn: () => T, handler: (err: Error) => void) {
   ERROR || (ERROR = Symbol("error"));
   Owner = createComputation(undefined!, undefined, true);
-  Owner.context = { [ERROR]: [handler] };
+  Owner.context = { ...Owner.context, [ERROR]: [handler] };
   if (Transition && Transition.running) Transition.sources.add(Owner as Memo<any>);
   try {
     return fn();
@@ -990,25 +1001,6 @@ export function catchError<T>(fn: () => T, handler: (err: Error) => void) {
   } finally {
     Owner = Owner.owner;
   }
-}
-
-/**
- * @deprecated since version 1.7.0 and will be removed in next major - use catchError instead
- * onError - run an effect whenever an error is thrown within the context of the child scopes
- * @param fn an error handler that receives the error
- *
- * * If the error is thrown again inside the error handler, it will trigger the next available parent handler
- *
- * @description https://www.solidjs.com/docs/latest/api#onerror
- */
-export function onError(fn: (err: Error) => void): void {
-  ERROR || (ERROR = Symbol("error"));
-  if (Owner === null)
-    "_SOLID_DEV_" &&
-      console.warn("error handlers created outside a `createRoot` or `render` will never be run");
-  else if (Owner.context === null) Owner.context = { [ERROR]: [fn] };
-  else if (!Owner.context[ERROR]) Owner.context[ERROR] = [fn];
-  else Owner.context[ERROR].push(fn);
 }
 
 export function getListener() {
@@ -1181,8 +1173,9 @@ export function createContext<T>(
  * @description https://www.solidjs.com/docs/latest/api#usecontext
  */
 export function useContext<T>(context: Context<T>): T {
-  let ctx;
-  return (ctx = lookup(Owner, context.id)) !== undefined ? ctx : context.defaultValue;
+  return Owner && Owner.context && Owner.context[context.id] !== undefined
+    ? Owner.context[context.id]
+    : context.defaultValue;
 }
 
 export type ResolvedJSXElement = Exclude<JSX.Element, JSX.ArrayElement>;
@@ -1218,7 +1211,7 @@ export type SuspenseContextType = {
   resolved?: boolean;
 };
 
-type SuspenseContext = Context<SuspenseContextType> & {
+type SuspenseContext = Context<SuspenseContextType | undefined> & {
   active?(): boolean;
   increment?(): void;
   decrement?(): void;
@@ -1227,7 +1220,7 @@ type SuspenseContext = Context<SuspenseContextType> & {
 let SuspenseContext: SuspenseContext;
 
 export function getSuspenseContext() {
-  return SuspenseContext || (SuspenseContext = createContext<SuspenseContextType>({}));
+  return SuspenseContext || (SuspenseContext = createContext<SuspenseContextType | undefined>());
 }
 
 // Interop
@@ -1401,7 +1394,7 @@ function createComputation<Next, Init = unknown>(
     cleanups: null,
     value: init,
     owner: Owner,
-    context: null,
+    context: Owner ? Owner.context : null,
     pure
   };
 
@@ -1659,7 +1652,6 @@ function cleanNode(node: Owner) {
   }
   if (Transition && Transition.running) (node as Computation<any>).tState = 0;
   else (node as Computation<any>).state = 0;
-  node.context = null;
   "_SOLID_DEV_" && delete node.sourceMap;
 }
 
@@ -1687,7 +1679,7 @@ function runErrors(err: unknown, fns: ((err: any) => void)[], owner: Owner | nul
 }
 
 function handleError(err: unknown, owner = Owner) {
-  const fns = ERROR && lookup(owner, ERROR);
+  const fns = ERROR && owner && owner.context && owner.context[ERROR];
   const error = castError(err);
   if (!fns) {
     console.error("solid error", error);
@@ -1703,14 +1695,6 @@ function handleError(err: unknown, owner = Owner) {
       state: STALE
     } as unknown as Computation<any>);
   else runErrors(error, fns, owner);
-}
-
-function lookup(owner: Owner | null, key: symbol | string): any {
-  return owner
-    ? owner.context && owner.context[key] !== undefined
-      ? owner.context[key]
-      : lookup(owner.owner, key)
-    : undefined;
 }
 
 function resolveChildren(children: JSX.Element | Accessor<any>): ResolvedChildren {
@@ -1732,7 +1716,7 @@ function createProvider(id: symbol, options?: EffectOptions) {
     createRenderEffect(
       () =>
         (res = untrack(() => {
-          Owner!.context = { [id]: props.value };
+          Owner!.context = { ...Owner!.context, [id]: props.value };
           return children(() => props.children);
         })),
       undefined,
@@ -1743,3 +1727,39 @@ function createProvider(id: symbol, options?: EffectOptions) {
 }
 
 type TODO = any;
+
+/**
+ * @deprecated since version 1.7.0 and will be removed in next major - use catchError instead
+ * onError - run an effect whenever an error is thrown within the context of the child scopes
+ * @param fn an error handler that receives the error
+ *
+ * * If the error is thrown again inside the error handler, it will trigger the next available parent handler
+ *
+ * @description https://www.solidjs.com/docs/latest/api#onerror
+ */
+export function onError(fn: (err: Error) => void): void {
+  ERROR || (ERROR = Symbol("error"));
+  if (Owner === null)
+    "_SOLID_DEV_" &&
+      console.warn("error handlers created outside a `createRoot` or `render` will never be run");
+  else if (Owner.context === null || !Owner.context[ERROR]) {
+    // terrible de-opt
+    Owner.context = { ...Owner.context, [ERROR]: [fn] };
+    mutateContext(Owner, ERROR, [fn]);
+  } else Owner.context[ERROR].push(fn);
+}
+
+function mutateContext(o: Owner, key: symbol, value: any) {
+  if (o.owned) {
+    for (let i = 0; i < o.owned.length; i++) {
+      if (o.owned[i].context === o.context) mutateContext(o.owned[i], key, value);
+      if (!o.owned[i].context) {
+        o.owned[i].context = o.context;
+        mutateContext(o.owned[i], key, value);
+      } else if (!o.owned[i].context[key]) {
+        o.owned[i].context[key] = value;
+        mutateContext(o.owned[i], key, value);
+      }
+    }
+  }
+}
