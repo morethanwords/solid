@@ -1689,7 +1689,11 @@ function runErrors(err: unknown, fns: ((err: any) => void)[], owner: Owner | nul
 function handleError(err: unknown, owner = Owner) {
   const fns = ERROR && lookup(owner, ERROR);
   const error = castError(err);
-  if (!fns) throw error;
+  if (!fns) {
+    console.error("solid error", error);
+    return;
+    // throw error;
+  }
 
   if (Effects)
     Effects!.push({
