@@ -1,4 +1,5 @@
-import { createRoot, createMemo, enableExternalSource } from "../src";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { createRoot, createMemo, untrack, enableExternalSource } from "../src/index.js";
 
 import "./MessageChannel";
 
@@ -27,6 +28,16 @@ class ExternalSource<T = any> {
 
 let listener: (() => void) | null = null;
 
+function untrackSource<T>(fn: () => T) {
+  const tmp = listener;
+  listener = null;
+  try {
+    return fn();
+  } finally {
+    listener = tmp;
+  }
+}
+
 let sources: Map<() => void, Set<ExternalSource>> = new Map();
 
 describe("external source", () => {
@@ -49,7 +60,7 @@ describe("external source", () => {
           sources.delete(trigger);
         }
       };
-    });
+    }, untrackSource);
 
     enableExternalSource(fn => {
       return {
@@ -64,9 +75,14 @@ describe("external source", () => {
       const memo = createMemo(() => {
         return e.get();
       });
+      const memo2 = createMemo(() => {
+        return untrack(() => e.get());
+      });
       expect(memo()).toBe(0);
+      expect(memo2()).toBe(0);
       e.update(1);
       expect(memo()).toBe(1);
+      expect(memo2()).toBe(0);
       fn();
     });
   });

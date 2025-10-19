@@ -2,13 +2,13 @@
  * @jsxImportSource solid-js
  * @vitest-environment jsdom
  */
-
-import { render, Switch, Match, For } from "../src";
-import { createRoot, createSignal } from "../../src";
-import { createStore } from "../../store/src";
+import { describe, expect, test } from "vitest";
+import { render, Switch, Match, For } from "../src/index.js";
+import { createRoot, createSignal } from "../../src/index.js";
+import { createStore } from "../../store/src/index.js";
 
 describe("Testing a single match switch control flow", () => {
-  let div: HTMLDivElement, disposer: () => void;
+  let div!: HTMLDivElement, disposer: () => void;
   const [count, setCount] = createSignal(0);
   const Component = () => (
     <div ref={div}>
@@ -38,7 +38,7 @@ describe("Testing a single match switch control flow", () => {
 });
 
 describe("Testing an only child Switch control flow", () => {
-  let div: HTMLDivElement, disposer: () => void;
+  let div!: HTMLDivElement, disposer: () => void;
   const [count, setCount] = createSignal(0);
   const Component = () => (
     <div ref={div}>
@@ -83,7 +83,7 @@ describe("Testing an only child Switch control flow", () => {
 });
 
 describe("Testing keyed Switch control flow", () => {
-  let div: HTMLDivElement, disposer: () => void;
+  let div!: HTMLDivElement, disposer: () => void;
   const [a, setA] = createSignal(0),
     [b, setB] = createSignal(0),
     [c, setC] = createSignal(0);
@@ -127,7 +127,7 @@ describe("Testing keyed Switch control flow", () => {
 });
 
 describe("Testing keyed function handler Switch control flow", () => {
-  let div: HTMLDivElement, disposer: () => void;
+  let div!: HTMLDivElement, disposer: () => void;
   const [a, setA] = createSignal(0),
     [b, setB] = createSignal(0),
     [c, setC] = createSignal(0);
@@ -171,7 +171,7 @@ describe("Testing keyed function handler Switch control flow", () => {
 });
 
 describe("Testing non-keyed function handler Switch control flow", () => {
-  let div: HTMLDivElement, disposer: () => void;
+  let div!: HTMLDivElement, disposer: () => void;
   const [a, setA] = createSignal(0),
     [b, setB] = createSignal(0),
     [c, setC] = createSignal(0);
@@ -208,8 +208,116 @@ describe("Testing non-keyed function handler Switch control flow", () => {
   test("dispose", () => disposer());
 });
 
+describe("Testing Switch conditions evaluation counts", () => {
+  let div!: HTMLDivElement, disposer: () => void;
+  function makeCondition() {
+    const [get, set] = createSignal(0);
+    const result = {
+      get,
+      set,
+      evalCount: 0,
+      getAndCount: () => {
+        result.evalCount++;
+        return get();
+      }
+    };
+    return result;
+  }
+  const a = makeCondition(),
+    b = makeCondition(),
+    c = makeCondition();
+  const Component = () => (
+    <div ref={div}>
+      <Switch fallback={"fallback"}>
+        <Match when={a.getAndCount()}>a={a.get()}</Match>
+        <Match when={b.getAndCount()}>{b => <>b={b()}</>}</Match>
+        <Match when={c.getAndCount()} keyed>
+          {c => <>c={c}</>}
+        </Match>
+      </Switch>
+    </div>
+  );
+
+  test("Create Switch control flow", () => {
+    createRoot(dispose => {
+      disposer = dispose;
+      <Component />;
+    });
+
+    expect(div.innerHTML).toBe("fallback");
+    expect(a.evalCount).toBe(1);
+    expect(b.evalCount).toBe(1);
+    expect(c.evalCount).toBe(1);
+  });
+
+  test("Toggle conditions", () => {
+    c.set(5);
+    expect(div.innerHTML).toBe("c=5");
+    expect(a.evalCount).toBe(1);
+    expect(b.evalCount).toBe(1);
+    expect(c.evalCount).toBe(2);
+    a.set(1);
+    expect(div.innerHTML).toBe("a=1");
+    expect(a.evalCount).toBe(2);
+    expect(b.evalCount).toBe(1);
+    expect(c.evalCount).toBe(2);
+    b.set(3);
+    expect(div.innerHTML).toBe("a=1");
+    expect(a.evalCount).toBe(2);
+    expect(b.evalCount).toBe(1); // did not evaluate
+    expect(c.evalCount).toBe(2);
+    b.set(2);
+    expect(div.innerHTML).toBe("a=1");
+    expect(a.evalCount).toBe(2);
+    expect(b.evalCount).toBe(1); // did not evaluate
+    expect(c.evalCount).toBe(2);
+    a.set(0);
+    expect(div.innerHTML).toBe("b=2");
+    expect(a.evalCount).toBe(3);
+    expect(b.evalCount).toBe(2); // evaluated now
+    expect(c.evalCount).toBe(2);
+    b.set(3);
+    expect(div.innerHTML).toBe("b=3");
+    expect(a.evalCount).toBe(3);
+    expect(b.evalCount).toBe(3);
+    expect(c.evalCount).toBe(2);
+    c.set(3);
+    expect(div.innerHTML).toBe("b=3");
+    expect(a.evalCount).toBe(3);
+    expect(b.evalCount).toBe(3);
+    expect(c.evalCount).toBe(2); // did not evaluate
+    a.set(1);
+    expect(div.innerHTML).toBe("a=1");
+    expect(a.evalCount).toBe(4);
+    expect(b.evalCount).toBe(3);
+    expect(c.evalCount).toBe(2);
+    b.set(1);
+    expect(div.innerHTML).toBe("a=1");
+    expect(a.evalCount).toBe(4);
+    expect(b.evalCount).toBe(3); // did not evaluate
+    expect(c.evalCount).toBe(2);
+    b.set(0);
+    expect(div.innerHTML).toBe("a=1");
+    expect(a.evalCount).toBe(4);
+    expect(b.evalCount).toBe(3); // did not evaluate
+    expect(c.evalCount).toBe(2);
+    a.set(0);
+    expect(div.innerHTML).toBe("c=3");
+    expect(a.evalCount).toBe(5);
+    expect(b.evalCount).toBe(4); // evaluated now, as b changed since its last evaluation
+    expect(c.evalCount).toBe(3); // evaluated now
+    c.set(0);
+    expect(div.innerHTML).toBe("fallback");
+    expect(a.evalCount).toBe(5);
+    expect(b.evalCount).toBe(4);
+    expect(c.evalCount).toBe(4);
+  });
+
+  test("dispose", () => disposer());
+});
+
 describe("Testing non-keyed function handler Switch control flow with dangling callback", () => {
-  let div: HTMLDivElement, disposer: () => void;
+  let div!: HTMLDivElement, disposer: () => void;
   const [a, setA] = createSignal(0),
     [b] = createSignal(2);
   let callback: () => void;
@@ -251,7 +359,7 @@ describe("Testing non-keyed function handler Switch control flow with dangling c
 });
 
 describe("Testing a For in a Switch control flow", () => {
-  let div: HTMLDivElement, disposer: () => void;
+  let div!: HTMLDivElement, disposer: () => void;
   const [state, setState] = createStore({
     users: [
       { firstName: "Jerry", certified: false },

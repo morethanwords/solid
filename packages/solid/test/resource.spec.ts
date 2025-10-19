@@ -1,3 +1,4 @@
+import { describe, expect, test } from "vitest";
 import {
   createRoot,
   createSignal,
@@ -7,10 +8,11 @@ import {
   Resource,
   ResourceFetcherInfo,
   Signal,
-  createMemo
-} from "../src";
+  createMemo,
+  getOwner
+} from "../src/index.js";
 
-import { createStore, reconcile, ReconcileOptions, Store, unwrap } from "../store/src";
+import { createStore, reconcile, ReconcileOptions, Store, unwrap } from "../store/src/index.js";
 
 describe("Simulate a dynamic fetch", () => {
   let resolve: (v: string) => void,
@@ -88,6 +90,7 @@ describe("Simulate a dynamic fetch with state and reconcile", () => {
     state: { user?: User; userLoading: boolean },
     count = 0;
   function fetcher(_: unknown, { value }: ResourceFetcherInfo<Store<User>>) {
+    expect(getOwner()).toBeDefined();
     return new Promise<User>(r => {
       resolve = r;
     }).then(next => reconcile(next)(value!));
@@ -205,6 +208,29 @@ describe("using Resource with errors", () => {
     await Promise.resolve();
     expect(value.state === "errored").toBe(true);
     expect(value.error.message).toBe("Unknown error");
+  });
+});
+
+describe("using Resource with synchronous error", () => {
+  let value: Resource<number | undefined>;
+  let error: Error;
+  test("catches the error", async () => {
+    createRoot(() => {
+      catchError(
+        () => {
+          [value] = createResource(() => {
+            throw new Error("Fetcher error");
+          });
+          createRenderEffect(value);
+        },
+        e => {
+          error = e;
+        }
+      );
+    });
+    expect(value.state === "errored").toBe(true);
+    expect(value.error).toBe(error);
+    expect(value.error.message).toBe("Fetcher error");
   });
 });
 
@@ -383,4 +409,34 @@ describe("using Resource with custom store", () => {
     expect(addr).toBe(1);
     expect(street).toBe(2);
   });
+});
+
+describe("createResource can be wrapped", () => {
+  const fns: [name: string, function: typeof createResource][] = [
+    ["original createResource", createResource],
+    // @ts-ignore
+    ["createResource(...args)", (...args) => createResource(...args)],
+    // @ts-ignore
+    ["createResource(a, b, c)", (a, b, c) => createResource(a, b, c)]
+  ];
+
+  for (const [name, fn] of fns) {
+    test(`only fetcher in ${name}`, () => {
+      const [[data], dispose] = createRoot(dispose => [fn(() => 123), dispose]);
+      expect(data()).toBe(123);
+      dispose();
+    });
+
+    test(`fetcher and source in ${name}`, () => {
+      const [source, setSource] = createSignal(1);
+
+      const [[data], dispose] = createRoot(dispose => [fn(source, v => v), dispose]);
+      expect(data()).toBe(1);
+
+      setSource(2);
+      expect(data()).toBe(2);
+
+      dispose();
+    });
+  }
 });

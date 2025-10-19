@@ -1,3 +1,4 @@
+import { describe, expect, it, test } from "vitest";
 import {
   createRoot,
   createComponent,
@@ -5,9 +6,10 @@ import {
   splitProps,
   createUniqueId,
   createSignal,
-  createEffect
-} from "../src";
-import { createStore } from "../store/src";
+  createEffect,
+  JSX
+} from "../src/index.js";
+import { createStore } from "../store/src/index.js";
 
 type SimplePropTypes = {
   a?: string | null;
@@ -41,7 +43,7 @@ describe("CreateComponent", () => {
     createRoot(() => {
       const nonObjects = [null, undefined, false];
       nonObjects.forEach(nonObject => {
-        const out = createComponent(p => p, nonObject);
+        const out = createComponent(p => p as JSX.Element, nonObject as any);
         expect(out).toEqual({});
       });
     });
@@ -100,6 +102,7 @@ describe("mergeProps", () => {
     a.value1 = b.value2 = 3;
     expect(props.value1).toBe(1);
     expect(props.value2).toBe(2);
+    expect(Object.keys(props).join()).toBe("value1,value2");
   });
   it("without getter transfers only value", () => {
     const a = { value1: 1 };
@@ -111,6 +114,7 @@ describe("mergeProps", () => {
     const props = mergeProps(a, b);
     a.value1 = 3;
     expect(props.value1).toBe(1);
+    expect(Object.keys(props).join()).toBe("value1,value2");
   });
   it("overrides enumerables", () => {
     const a = Object.defineProperties(
@@ -204,7 +208,7 @@ describe("mergeProps", () => {
   });
   it("works with a array source", () => {
     const props = mergeProps({ value: 1 }, [2]);
-    expect(Object.keys(props).join()).toBe("0,length,value");
+    expect(Object.keys(props).join()).toBe("0,value,length");
     expect(props.value).toBe(1);
     expect(props.length).toBe(1);
     expect(props[0]).toBe(2);

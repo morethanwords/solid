@@ -1,4 +1,5 @@
 /** @vitest-environment jsdom */
+import { describe, expect, test } from "vitest";
 import {
   createRoot,
   createSignal,
@@ -18,7 +19,7 @@ import {
   useContext,
   getOwner,
   runWithOwner
-} from "../src";
+} from "../src/index.js";
 
 import "./MessageChannel";
 
@@ -80,6 +81,17 @@ describe("Create signals", () => {
     expect(temp!).toBeUndefined();
     set("minds");
     expect(temp!).toBe("impure minds");
+  });
+  test("Create a Effect with explicit deps, lazy evaluation, and initial value", () => {
+    let temp: string;
+    const [sign, set] = createSignal("thoughts");
+    createRoot(() => {
+      const fn = on(sign, (v, _, p) => (temp = `impure ${p} ${v}`), { defer: true });
+      createEffect(fn, "numbers");
+    });
+    expect(temp!).toBeUndefined();
+    set("minds");
+    expect(temp!).toBe("impure numbers minds");
   });
 });
 

@@ -16,15 +16,19 @@ function applyState(
 ) {
   const previous = parent[property];
   if (target === previous) return;
+  const isArray = Array.isArray(target);
   if (
     property !== $ROOT &&
-    (!isWrappable(target) || !isWrappable(previous) || (key && target[key] !== previous[key]))
+    (!isWrappable(target) ||
+      !isWrappable(previous) ||
+      isArray !== Array.isArray(previous) ||
+      (key && target[key] !== previous[key]))
   ) {
     setProperty(parent, property, target);
     return;
   }
 
-  if (Array.isArray(target)) {
+  if (isArray) {
     if (
       target.length &&
       previous.length &&
@@ -36,7 +40,11 @@ function applyState(
         start = 0, end = Math.min(previous.length, target.length);
         start < end &&
         (previous[start] === target[start] ||
-          (key && previous[start] && target[start] && previous[start][key] === target[start][key]));
+          (key &&
+            previous[start] &&
+            target[start] &&
+            previous[start][key] &&
+            previous[start][key] === target[start][key]));
         start++
       ) {
         applyState(target[start], previous, start, merge, key);
@@ -50,7 +58,11 @@ function applyState(
         end >= start &&
         newEnd >= start &&
         (previous[end] === target[newEnd] ||
-          (key && previous[start] && target[start] && previous[end][key] === target[newEnd][key]));
+          (key &&
+            previous[end] &&
+            target[newEnd] &&
+            previous[end][key] &&
+            previous[end][key] === target[newEnd][key]));
         end--, newEnd--
       ) {
         temp[newEnd] = previous[end];

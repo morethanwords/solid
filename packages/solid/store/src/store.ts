@@ -1,5 +1,8 @@
 import { getListener, batch, DEV, $PROXY, $TRACK, createSignal } from "solid-js";
 
+// replaced during build
+export const IS_DEV = "_SOLID_DEV_" as string | boolean;
+
 export const $RAW = Symbol("store-raw"),
   $NODE = Symbol("store-node"),
   $HAS = Symbol("store-has"),
@@ -14,7 +17,7 @@ type DataNode = {
   (): any;
   $(value?: any): void;
 };
-type DataNodes = Record<PropertyKey, DataNode | undefined>;
+export type DataNodes = Record<PropertyKey, DataNode | undefined>;
 
 export type OnStoreNodeUpdate = (
   state: StoreNode,
@@ -192,12 +195,12 @@ const proxyTraps: ProxyHandler<StoreNode> = {
   },
 
   set() {
-    if ("_SOLID_DEV_") console.warn("Cannot mutate a Store directly");
+    if (IS_DEV) console.warn("Cannot mutate a Store directly");
     return true;
   },
 
   deleteProperty() {
-    if ("_SOLID_DEV_") console.warn("Cannot mutate a Store directly");
+    if (IS_DEV) console.warn("Cannot mutate a Store directly");
     return true;
   },
 
@@ -216,7 +219,7 @@ export function setProperty(
   const prev = state[property],
     len = state.length;
 
-  if ("_SOLID_DEV_")
+  if (IS_DEV)
     DevHooks.onStoreNodeUpdate && DevHooks.onStoreNodeUpdate(state, property, value, prev);
 
   if (value === undefined) {
@@ -313,18 +316,18 @@ export function updatePath(current: StoreNode, path: any[], traversed: PropertyK
 export type DeepReadonly<T> = 0 extends 1 & T
   ? T
   : T extends NotWrappable
-  ? T
-  : {
-      readonly [K in keyof T]: DeepReadonly<T[K]>;
-    };
+    ? T
+    : {
+        readonly [K in keyof T]: DeepReadonly<T[K]>;
+      };
 /** @deprecated */
 export type DeepMutable<T> = 0 extends 1 & T
   ? T
   : T extends NotWrappable
-  ? T
-  : {
-      -readonly [K in keyof T]: DeepMutable<T[K]>;
-    };
+    ? T
+    : {
+        -readonly [K in keyof T]: DeepMutable<T[K]>;
+      };
 
 export type CustomPartial<T> = T extends readonly unknown[]
   ? "0" extends keyof T
@@ -364,11 +367,11 @@ type KeyOf<T> = number extends keyof T // have to check this otherwise ts won't 
   ? 0 extends 1 & T // if it's any just return keyof T
     ? keyof T
     : [T] extends [never]
-    ? never // keyof never is PropertyKey, which number extends. this must go before
-    : // checking [T] extends [readonly unknown[]] because never extends everything
-    [T] extends [readonly unknown[]]
-    ? number // it's an array or tuple; exclude the non-number properties
-    : keyof T // it's something which contains an index signature for strings or numbers
+      ? never // keyof never is PropertyKey, which number extends. this must go before
+      : // checking [T] extends [readonly unknown[]] because never extends everything
+        [T] extends [readonly unknown[]]
+        ? number // it's an array or tuple; exclude the non-number properties
+        : keyof T // it's something which contains an index signature for strings or numbers
   : keyof T;
 
 type MutableKeyOf<T> = KeyOf<T> & keyof PickMutable<T>;
@@ -377,10 +380,10 @@ type MutableKeyOf<T> = KeyOf<T> & keyof PickMutable<T>;
 type Rest<T, U extends PropertyKey[], K extends KeyOf<T> = KeyOf<T>> = [T] extends [never]
   ? never
   : K extends MutableKeyOf<T>
-  ? [Part<T, K>, ...RestSetterOrContinue<T[K], [K, ...U]>]
-  : K extends KeyOf<T>
-  ? [Part<T, K>, ...RestContinue<T[K], [K, ...U]>]
-  : never;
+    ? [Part<T, K>, ...RestSetterOrContinue<T[K], [K, ...U]>]
+    : K extends KeyOf<T>
+      ? [Part<T, K>, ...RestContinue<T[K], [K, ...U]>]
+      : never;
 
 type RestContinue<T, U extends PropertyKey[]> = 0 extends 1 & T
   ? [...Part<any>[], StoreSetter<any, PropertyKey[]>]
@@ -491,9 +494,9 @@ export interface SetStoreFunction<T> {
 }
 
 /**
- * creates a reactive store that can be read through a proxy object and written with a setter function
+ * Creates a reactive store that can be read through a proxy object and written with a setter function
  *
- * @description https://www.solidjs.com/docs/latest/api#createstore
+ * @description https://docs.solidjs.com/reference/store-utilities/create-store
  */
 export function createStore<T extends object = {}>(
   ...[store, options]: {} extends T
@@ -502,12 +505,12 @@ export function createStore<T extends object = {}>(
 ): [get: Store<T>, set: SetStoreFunction<T>] {
   const unwrappedStore = unwrap((store || {}) as T);
   const isArray = Array.isArray(unwrappedStore);
-  if ("_SOLID_DEV_" && typeof unwrappedStore !== "object" && typeof unwrappedStore !== "function")
+  if (IS_DEV && typeof unwrappedStore !== "object" && typeof unwrappedStore !== "function")
     throw new Error(
       `Unexpected type ${typeof unwrappedStore} received when initializing 'createStore'. Expected an object.`
     );
   const wrappedStore = wrap(unwrappedStore);
-  if ("_SOLID_DEV_") DEV!.registerGraph({ value: unwrappedStore, name: options && options.name });
+  if (IS_DEV) DEV!.registerGraph({ value: unwrappedStore, name: options && options.name });
   function setStore(...args: any[]): void {
     batch(() => {
       isArray && args.length === 1

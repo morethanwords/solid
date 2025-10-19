@@ -2,12 +2,12 @@
  * @jsxImportSource solid-js
  * @vitest-environment jsdom
  */
-
-import { createRoot, resetErrorBoundaries } from "../../src";
-import { ErrorBoundary } from "../src";
+import { describe, expect, test } from "vitest";
+import { createRoot, resetErrorBoundaries } from "../../src/index.js";
+import { ErrorBoundary } from "../src/index.js";
 
 describe("Testing ErrorBoundary control flow", () => {
-  let div: HTMLDivElement, disposer: () => void;
+  let div!: HTMLDivElement, disposer: () => void;
 
   const Component = () => {
     throw new Error("Failure");

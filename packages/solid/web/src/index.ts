@@ -37,8 +37,10 @@ export const isServer: boolean = false;
 export const isDev: boolean = "_SOLID_DEV_" as unknown as boolean;
 const SVG_NAMESPACE = "http://www.w3.org/2000/svg";
 
-function createElement(tagName: string, isSVG = false): HTMLElement | SVGElement {
-  return isSVG ? document.createElementNS(SVG_NAMESPACE, tagName) : document.createElement(tagName);
+function createElement(tagName: string, isSVG = false, is = undefined): HTMLElement | SVGElement {
+  return isSVG
+    ? document.createElementNS(SVG_NAMESPACE, tagName)
+    : document.createElement(tagName, { is });
 }
 
 export const hydrate: typeof hydrateCore = (...args) => {
@@ -47,11 +49,11 @@ export const hydrate: typeof hydrateCore = (...args) => {
 };
 
 /**
- * renders components somewhere else in the DOM
+ * Renders components somewhere else in the DOM
  *
  * Useful for inserting modals and tooltips outside of an cropping layout. If no mount point is given, the portal is inserted in document.body; it is wrapped in a `<div>` unless the target is document.head or `isSVG` is true. setting `useShadow` to true places the element in a shadow root to isolate styles.
  *
- * @description https://www.solidjs.com/docs/latest/api#portal
+ * @description https://docs.solidjs.com/reference/components/portal
  */
 export function Portal<T extends boolean = false, S extends boolean = false>(props: {
   mount?: Node;
@@ -113,31 +115,57 @@ export type DynamicProps<T extends ValidComponent, P = ComponentProps<T>> = {
 } & {
   component: T | undefined;
 };
+
 /**
- * renders an arbitrary custom or native component and passes the other props
+ * Renders an arbitrary component or element with the given props
+ *
+ * This is a lower level version of the `Dynamic` component, useful for
+ * performance optimizations in libraries. Do not use this unless you know
+ * what you are doing.
  * ```typescript
- * <Dynamic component={multiline() ? 'textarea' : 'input'} value={value()} />
+ * const element = () => multiline() ? 'textarea' : 'input';
+ * createDynamic(element, { value: value() });
  * ```
- * @description https://www.solidjs.com/docs/latest/api#dynamic
+ * @description https://docs.solidjs.com/reference/components/dynamic
  */
-export function Dynamic<T extends ValidComponent>(props: DynamicProps<T>): JSX.Element {
-  const [p, others] = splitProps(props, ["component"]);
-  const cached = createMemo<Function | string>(() => p.component);
+export function createDynamic<T extends ValidComponent>(
+  component: () => T | undefined,
+  props: ComponentProps<T>
+): JSX.Element {
+  const cached = createMemo<Function | string | undefined>(component);
   return createMemo(() => {
     const component = cached();
     switch (typeof component) {
       case "function":
-        if ("_DX_DEV_") Object.assign(component, { [$DEVCOMP]: true });
-        return untrack(() => component(others));
+        if (isDev) Object.assign(component, { [$DEVCOMP]: true });
+        return untrack(() => component(props));
 
       case "string":
         const isSvg = SVGElements.has(component);
-        const el = sharedConfig.context ? getNextElement() : createElement(component, isSvg);
-        spread(el, others, isSvg);
+        const el = sharedConfig.context
+          ? getNextElement()
+          : createElement(
+              component,
+              isSvg,
+              untrack(() => props.is)
+            );
+        spread(el, props, isSvg);
         return el;
 
       default:
         break;
     }
   }) as unknown as JSX.Element;
+}
+
+/**
+ * Renders an arbitrary custom or native component and passes the other props
+ * ```typescript
+ * <Dynamic component={multiline() ? 'textarea' : 'input'} value={value()} />
+ * ```
+ * @description https://docs.solidjs.com/reference/components/dynamic
+ */
+export function Dynamic<T extends ValidComponent>(props: DynamicProps<T>): JSX.Element {
+  const [, others] = splitProps(props, ["component"]);
+  return createDynamic(() => props.component, others as ComponentProps<T>);
 }

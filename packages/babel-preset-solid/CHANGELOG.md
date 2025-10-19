@@ -1,5 +1,141 @@
 # babel-preset-solid
 
+## 1.9.9
+
+### Patch Changes
+
+- c07887c: fix #2524 closedby types, fix regression inlining style/classList
+- Updated dependencies [f59ee48]
+- Updated dependencies [62c5a98]
+- Updated dependencies [62c5a98]
+- Updated dependencies [c07887c]
+  - solid-js@1.9.9
+
+## 1.9.8
+
+### Patch Changes
+
+- 2cd810f: compiler and jsx type updates
+  - fix: ssr style undefined
+  - fix: ssr double escaped array
+  - fix: skip jsxImportSource skipping transform
+  - fix: @once on style, classlist
+  - JSX type updates
+  - Update Universal Renderer Types
+
+## 1.9.6
+
+### Patch Changes
+
+- 8356213: update compiler config, fix boolean attribute regression, update JSX types
+
+## 1.9.5
+
+### Patch Changes
+
+- 35266c1: JSX type updates, preliminary MathML support, fix spread overescaping
+
+## 1.9.3
+
+### Patch Changes
+
+- 9b70a15: validation fixes, type updates, ssr attribute fix
+
+## 1.9.2
+
+### Patch Changes
+
+- 22aff14: update validation: smaller lib, opt out, better table handling
+  add `on:` event types for native events
+
+## 1.9.0
+
+### Minor Changes
+
+- 2a3a1980: update dom-expressions
+  - Improved Custom Element/Shadow DOM traversal - @olivercoad
+  - Better heuristic to determine when to importNode - @titoBouzout
+  - handleEvent syntax to allow custom event properties when not delegated - @titoBouzout
+  - support for bool: attribute namespace - @titoBouzout
+  - add "is" as detection for custom element - @titoBouzout
+  - fix missing exports in different envs - @trusktr
+  - better hydration mismatch errors - @ryansolid
+  - improved HTML validation of JSX partials - @titoBouzout
+
+## 1.8.22
+
+### Patch Changes
+
+- 26128ec0: fix #2259 attr: in ssr, updates some types
+
+## 1.8.19
+
+### Patch Changes
+
+- 816a5c61: fix #2209 processing parent before child value binding in select
+- 424a31a3: optimize hydration keys
+
+## 1.8.18
+
+### Patch Changes
+
+- 6693b56f: update TS, custom elements, and a lot compiler fixes
+  fixes #2144, #2145, #2178, #2192
+
+## 1.8.17
+
+### Patch Changes
+
+- 72c5381d: fix #2134, merge dom expressions fix #2136, fix #2137, fix #2110
+
+## 1.8.16
+
+### Patch Changes
+
+- 071cd42f: fix #2100, fix #2102 - hydration errors due to over optimization
+
+## 1.8.15
+
+### Patch Changes
+
+- 4ee461dc: improve template escaping, fragment hydration, SVG use types
+
+## 1.8.12
+
+### Patch Changes
+
+- 85b26c36: fix #2041, fix #2043 - async renderer timing, numeric prop literals
+
+## 1.8.9
+
+### Patch Changes
+
+- 80d4830f: fix #2016 value spread, smaller build output
+
+## 1.8.8
+
+### Patch Changes
+
+- 968e2cc9: update seroval, fix #1972, fix #1980, fix #2002, support partial ALS
+
+## 1.8.6
+
+### Patch Changes
+
+- 54e1aecf: update seroval, fix this, optimize star imports, fix #1952 hydration race condition
+
+## 1.8.4
+
+### Patch Changes
+
+- cf0542a4: fix #1927, fix #1929, fix #1931, update storage API
+
+## 1.8.2
+
+### Patch Changes
+
+- dd492c5e: fix #1917, fix #1918 error handling with serialization
+
 ## 1.8.0
 
 ### Minor Changes

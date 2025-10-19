@@ -10,7 +10,8 @@ import {
   $HAS,
   StoreNode,
   setProperty,
-  ownKeys
+  ownKeys,
+  IS_DEV
 } from "./store.js";
 
 function proxyDescriptor(target: StoreNode, property: PropertyKey) {
@@ -94,19 +95,40 @@ function wrap<T extends StoreNode>(value: T): T {
     Object.defineProperty(value, $PROXY, { value: (p = new Proxy(value, proxyTraps)) });
     const keys = Object.keys(value),
       desc = Object.getOwnPropertyDescriptors(value);
+
+    const proto = Object.getPrototypeOf(value);
+    const isClass =
+      proto !== null &&
+      value !== null &&
+      typeof value === "object" &&
+      !Array.isArray(value) &&
+      proto !== Object.prototype;
+    if (isClass) {
+      let curProto = proto;
+      while (curProto != null) {
+        const descriptors = Object.getOwnPropertyDescriptors(curProto);
+        keys.push(...Object.keys(descriptors));
+        Object.assign(desc, descriptors);
+        curProto = Object.getPrototypeOf(curProto);
+      }
+    }
+
     for (let i = 0, l = keys.length; i < l; i++) {
       const prop = keys[i];
+      if (isClass && prop === "constructor") continue;
       if (desc[prop].get) {
         const get = desc[prop].get!.bind(p);
         Object.defineProperty(value, prop, {
-          get
+          get,
+          configurable: true
         });
       }
       if (desc[prop].set) {
         const og = desc[prop].set!,
           set = (v: T[keyof T]) => batch(() => og.call(p, v));
         Object.defineProperty(value, prop, {
-          set
+          set,
+          configurable: true
         });
       }
     }
@@ -116,13 +138,13 @@ function wrap<T extends StoreNode>(value: T): T {
 
 export function createMutable<T extends StoreNode>(state: T, options?: { name?: string }): T {
   const unwrappedStore = unwrap(state || {});
-  if ("_SOLID_DEV_" && typeof unwrappedStore !== "object" && typeof unwrappedStore !== "function")
+  if (IS_DEV && typeof unwrappedStore !== "object" && typeof unwrappedStore !== "function")
     throw new Error(
       `Unexpected type ${typeof unwrappedStore} received when initializing 'createMutable'. Expected an object.`
     );
 
   const wrappedStore = wrap(unwrappedStore);
-  if ("_SOLID_DEV_") DEV!.registerGraph({ value: unwrappedStore, name: options && options.name });
+  if (IS_DEV) DEV!.registerGraph({ value: unwrappedStore, name: options && options.name });
   return wrappedStore;
 }
 

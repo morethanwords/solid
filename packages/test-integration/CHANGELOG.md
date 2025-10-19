@@ -1,5 +1,322 @@
 # test-integration
 
+## 1.9.9
+
+### Patch Changes
+
+- Updated dependencies [f59ee48]
+- Updated dependencies [62c5a98]
+- Updated dependencies [62c5a98]
+- Updated dependencies [c07887c]
+  - solid-js@1.9.9
+  - babel-preset-solid@1.9.9
+
+## 1.9.8
+
+### Patch Changes
+
+- Updated dependencies [09a9c1d]
+- Updated dependencies [472c007]
+- Updated dependencies [3d3207d]
+- Updated dependencies [2cd810f]
+- Updated dependencies [cbff564]
+- Updated dependencies [e056eab]
+- Updated dependencies [bdba4dc]
+  - solid-js@1.9.8
+  - babel-preset-solid@1.9.8
+
+## 1.9.7
+
+### Patch Changes
+
+- Updated dependencies [4cd7eb1]
+  - solid-js@1.9.7
+
+## 1.9.6
+
+### Patch Changes
+
+- Updated dependencies [362e99f]
+- Updated dependencies [8356213]
+- Updated dependencies [c65faec]
+- Updated dependencies [6380b01]
+  - solid-js@1.9.6
+  - babel-preset-solid@1.9.6
+
+## 1.9.5
+
+### Patch Changes
+
+- Updated dependencies [86ae8a9]
+- Updated dependencies [89e016d]
+- Updated dependencies [9431b88]
+- Updated dependencies [35266c1]
+- Updated dependencies [0eab77d]
+- Updated dependencies [fff8aed]
+- Updated dependencies [f9ef621]
+  - solid-js@1.9.5
+  - babel-preset-solid@1.9.5
+
+## 1.9.4
+
+### Patch Changes
+
+- Updated dependencies [b93956f]
+- Updated dependencies [199dd69]
+- Updated dependencies [7f9cd3d]
+- Updated dependencies [32aa744]
+  - solid-js@1.9.4
+
+## 1.9.3
+
+### Patch Changes
+
+- Updated dependencies [bb6ce8b]
+- Updated dependencies [9b70a15]
+  - solid-js@1.9.3
+  - babel-preset-solid@1.9.3
+
+## 1.9.2
+
+### Patch Changes
+
+- Updated dependencies [22aff14]
+- Updated dependencies [e2e2a03]
+  - babel-preset-solid@1.9.2
+  - solid-js@1.9.2
+
+## 1.9.1
+
+### Patch Changes
+
+- Updated dependencies [fb67b687]
+- Updated dependencies [7ecf92d3]
+  - solid-js@1.9.1
+
+## 1.9.0
+
+### Minor Changes
+
+- 2a3a1980: update dom-expressions
+  - Improved Custom Element/Shadow DOM traversal - @olivercoad
+  - Better heuristic to determine when to importNode - @titoBouzout
+  - handleEvent syntax to allow custom event properties when not delegated - @titoBouzout
+  - support for bool: attribute namespace - @titoBouzout
+  - add "is" as detection for custom element - @titoBouzout
+  - fix missing exports in different envs - @trusktr
+  - better hydration mismatch errors - @ryansolid
+  - improved HTML validation of JSX partials - @titoBouzout
+
+### Patch Changes
+
+- Updated dependencies [4f8597dc]
+- Updated dependencies [120bf06d]
+- Updated dependencies [80b09589]
+- Updated dependencies [2a3a1980]
+- Updated dependencies [51bec61a]
+  - solid-js@1.9.0
+  - babel-preset-solid@1.9.0
+
+## 1.8.23
+
+### Patch Changes
+
+- Updated dependencies [bc20a4ce]
+- Updated dependencies [9697c94b]
+- Updated dependencies [9e192d7e]
+- Updated dependencies [379293d9]
+- Updated dependencies [73c00927]
+- Updated dependencies [e4b2c668]
+- Updated dependencies [94929afa]
+  - solid-js@1.8.23
+
+## 1.8.22
+
+### Patch Changes
+
+- Updated dependencies [f8ae663c]
+- Updated dependencies [19d0295f]
+- Updated dependencies [26128ec0]
+  - solid-js@1.8.22
+  - babel-preset-solid@1.8.22
+
+## 1.8.21
+
+### Patch Changes
+
+- Updated dependencies [a036a63a]
+  - solid-js@1.8.21
+
+## 1.8.20
+
+### Patch Changes
+
+- Updated dependencies [c8fe58e9]
+- Updated dependencies [80dd2769]
+  - solid-js@1.8.20
+
+## 1.8.19
+
+### Patch Changes
+
+- Updated dependencies [3fc015c2]
+- Updated dependencies [f909c1c1]
+- Updated dependencies [816a5c61]
+- Updated dependencies [424a31a3]
+  - solid-js@1.8.19
+  - babel-preset-solid@1.8.19
+
+## 1.8.18
+
+### Patch Changes
+
+- Updated dependencies [6693b56f]
+- Updated dependencies [a8c2a8f3]
+  - babel-preset-solid@1.8.18
+  - solid-js@1.8.18
+
+## 1.8.17
+
+### Patch Changes
+
+- Updated dependencies [72c5381d]
+- Updated dependencies [e065e475]
+  - babel-preset-solid@1.8.17
+  - solid-js@1.8.17
+
+## 1.8.16
+
+### Patch Changes
+
+- Updated dependencies [8de75a47]
+- Updated dependencies [071cd42f]
+- Updated dependencies [3212f74d]
+  - solid-js@1.8.16
+  - babel-preset-solid@1.8.16
+
+## 1.8.15
+
+### Patch Changes
+
+- Updated dependencies [829af663]
+- Updated dependencies [4ee461dc]
+  - solid-js@1.8.15
+  - babel-preset-solid@1.8.15
+
+## 1.8.14
+
+### Patch Changes
+
+- Updated dependencies [4b76be80]
+  - solid-js@1.8.14
+
+## 1.8.13
+
+### Patch Changes
+
+- Updated dependencies [3ac8210c]
+  - solid-js@1.8.13
+
+## 1.8.12
+
+### Patch Changes
+
+- Updated dependencies [aba5de08]
+- Updated dependencies [85b26c36]
+  - solid-js@1.8.12
+  - babel-preset-solid@1.8.12
+
+## 1.8.11
+
+### Patch Changes
+
+- Updated dependencies [1ec67f15]
+  - solid-js@1.8.11
+
+## 1.8.10
+
+### Patch Changes
+
+- Updated dependencies [169d23b4]
+  - solid-js@1.8.10
+
+## 1.8.9
+
+### Patch Changes
+
+- Updated dependencies [80d4830f]
+- Updated dependencies [918586fb]
+- Updated dependencies [71bea784]
+- Updated dependencies [b0862d39]
+- Updated dependencies [cbc8d3ee]
+  - babel-preset-solid@1.8.9
+  - solid-js@1.8.9
+
+## 1.8.8
+
+### Patch Changes
+
+- Updated dependencies [40b5d78d]
+- Updated dependencies [968e2cc9]
+- Updated dependencies [292aba41]
+- Updated dependencies [7e5667ab]
+- Updated dependencies [8d2de12f]
+- Updated dependencies [b887587a]
+  - solid-js@1.8.8
+  - babel-preset-solid@1.8.8
+
+## 1.8.7
+
+### Patch Changes
+
+- Updated dependencies [22667bbc]
+- Updated dependencies [e09a3cc3]
+  - solid-js@1.8.7
+
+## 1.8.6
+
+### Patch Changes
+
+- Updated dependencies [2b320376]
+- Updated dependencies [fb7f4bc1]
+- Updated dependencies [b092368c]
+- Updated dependencies [54e1aecf]
+  - solid-js@1.8.6
+  - babel-preset-solid@1.8.6
+
+## 1.8.5
+
+### Patch Changes
+
+- Updated dependencies [80ca972f]
+  - solid-js@1.8.5
+
+## 1.8.4
+
+### Patch Changes
+
+- Updated dependencies [cf0542a4]
+- Updated dependencies [3f3a3396]
+  - babel-preset-solid@1.8.4
+  - solid-js@1.8.4
+
+## 1.8.3
+
+### Patch Changes
+
+- Updated dependencies [1f0226e1]
+  - solid-js@1.8.3
+
+## 1.8.2
+
+### Patch Changes
+
+- Updated dependencies [b632dfd5]
+- Updated dependencies [dd492c5e]
+- Updated dependencies [4968fe26]
+  - solid-js@1.8.2
+  - babel-preset-solid@1.8.2
+
 ## 1.8.1
 
 ### Patch Changes

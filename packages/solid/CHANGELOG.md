@@ -1,5 +1,281 @@
 # solid-js
 
+## 1.9.9
+
+### Patch Changes
+
+- f59ee48: fix dynamic overtracking
+- 62c5a98: Update `SuspenseList` to handle hydration context
+- 62c5a98: Add unit tests for `resolveSSRNode` and `createResource` functions
+- c07887c: fix #2524 closedby types, fix regression inlining style/classList
+
+## 1.9.8
+
+### Patch Changes
+
+- 09a9c1d: Export RendererOptions and Renderer types from solid-js/universal
+- 472c007: fix(scheduler): adjust yield timing logic to improve task scheduling …
+- 3d3207d: fix #2491 no key on merge false
+- 2cd810f: compiler and jsx type updates
+  - fix: ssr style undefined
+  - fix: ssr double escaped array
+  - fix: skip jsxImportSource skipping transform
+  - fix: @once on style, classlist
+  - JSX type updates
+  - Update Universal Renderer Types
+- cbff564: feat: createMutable support for class inheritance
+- e056eab: add support for `is` in `Dynamic`, closes #2413
+- bdba4dc: Fix resource instances always getting cached on SSR
+- Updated dependencies [2cd810f]
+  - babel-preset-solid@1.9.8
+
+## 1.9.7
+
+### Patch Changes
+
+- 84ca952: Fix hydration issues caused by seroval update.
+- 4cd7eb1: Catch synchronous errors in `createResource`.
+
+## 1.9.6
+
+### Patch Changes
+
+- 362e99f: fix #2444 prev value in memo messing with reactive rendering
+- 8356213: update compiler config, fix boolean attribute regression, update JSX types
+- c65faec: fix #2428 - owner always present in resource fetcher
+- 6380b01: fix #2399: novalidate, #2460 spellcheck types
+
+## 1.9.5
+
+### Patch Changes
+
+- 86ae8a9: add optional initalValue argument to `from` helper
+- 89e016d: dev: Add `internal` flag to signal
+- 9431b88: Mirror createDynamic for SSR
+- 35266c1: JSX type updates, preliminary MathML support, fix spread overescaping
+- 0eab77d: Removed unnecessary evaluations of <Show> and <Match> conditions.
+- fff8aed: Update typescript to 5.7
+- f9ef621: dev: Add afterRegisterGraph hook replacing afterCreateSignal
+
+## 1.9.4
+
+### Patch Changes
+
+- b93956f: fix escaping in resolution done outside of DOM Expressions
+- 199dd69: fix reconcile null guard
+- 7f9cd3d: lazy image, tagged template detection, security fixes
+- 32aa744: Improve resolving arguments in createResource
+
+## 1.9.3
+
+### Patch Changes
+
+- bb6ce8b: Reordering setter overloads
+- 9b70a15: validation fixes, type updates, ssr attribute fix
+
+## 1.9.2
+
+### Patch Changes
+
+- 22aff14: update validation: smaller lib, opt out, better table handling
+  add `on:` event types for native events
+- e2e2a03: Fix setter type compatibility with kobalte select and add tests
+
+## 1.9.1
+
+### Patch Changes
+
+- fb67b687: fix anchor host interfering with event delegation
+- 7ecf92d3: fix #2304 component props can be string, explicit imports in tests
+
+## 1.9.0
+
+### Minor Changes
+
+- 4f8597dc: better handling of exports client/server
+- 120bf06d: fix!: Remove browser field from package.json
+- 2a3a1980: update dom-expressions
+  - Improved Custom Element/Shadow DOM traversal - @olivercoad
+  - Better heuristic to determine when to importNode - @titoBouzout
+  - handleEvent syntax to allow custom event properties when not delegated - @titoBouzout
+  - support for bool: attribute namespace - @titoBouzout
+  - add "is" as detection for custom element - @titoBouzout
+  - fix missing exports in different envs - @trusktr
+  - better hydration mismatch errors - @ryansolid
+  - improved HTML validation of JSX partials - @titoBouzout
+
+### Patch Changes
+
+- 80b09589: Improve signal setter type for code completion of string literal unions.
+- 51bec61a: update TS to NodeNext
+
+## 1.8.23
+
+### Patch Changes
+
+- bc20a4ce: update types, fix hydration cancel timing error, sync ssr script appending
+- 9697c94b: jsdoc: Fix incorrect links of reactive utility `on`
+- 9e192d7e: fix #2282: Add Check for Proxy support
+- 379293d9: use correct hydration id in server lazy
+- 73c00927: Fix missing code block end in `useTransition`'s jsdoc comment
+- e4b2c668: fix missing disposal of nested transition nodes
+- 94929afa: fix wrapping of object with `null` prototype
+
+## 1.8.22
+
+### Patch Changes
+
+- f8ae663c: Fix broken links in Readme
+- 19d0295f: fix stranded effects during hydration cancelation
+- 26128ec0: fix #2259 attr: in ssr, updates some types
+
+## 1.8.21
+
+### Patch Changes
+
+- a036a63a: shortcut hydrate call when hydration is done
+
+## 1.8.20
+
+### Patch Changes
+
+- c8fe58e9: fix #2250 hydration error, fix lazy component loading, better hydration cancelation
+- 80dd2769: fix #2236 improper shortcircuit in resource hydration
+
+## 1.8.19
+
+### Patch Changes
+
+- 3fc015c2: track length in array helpers, fix mobx external source
+- f909c1c1: fix #2228 - chained resources with initial values
+- 816a5c61: fix #2209 processing parent before child value binding in select
+- 424a31a3: optimize hydration keys
+
+## 1.8.18
+
+### Patch Changes
+
+- 6693b56f: update TS, custom elements, and a lot compiler fixes
+  fixes #2144, #2145, #2178, #2192
+- a8c2a8f3: remove weird server resource hack, fix hydrated resource state
+
+## 1.8.17
+
+### Patch Changes
+
+- 72c5381d: fix #2134, merge dom expressions fix #2136, fix #2137, fix #2110
+- e065e475: fix #2135 ssr of top level fragments under Suspense
+
+## 1.8.16
+
+### Patch Changes
+
+- 8de75a47: fix #2065 forward initial value to `on`
+- 071cd42f: fix #2100, fix #2102 - hydration errors due to over optimization
+- 3212f74d: Adjust some JSDocs
+
+## 1.8.15
+
+### Patch Changes
+
+- 829af663: fix #2047 early interaction/multiple resources
+- 4ee461dc: improve template escaping, fragment hydration, SVG use types
+
+## 1.8.14
+
+### Patch Changes
+
+- 4b76be80: fix storage export in top-level package.json
+
+## 1.8.13
+
+### Patch Changes
+
+- 3ac8210c: fix storage export
+
+## 1.8.12
+
+### Patch Changes
+
+- aba5de08: fix #1746 class properties not working getters in createMutable
+- 85b26c36: fix #2041, fix #2043 - async renderer timing, numeric prop literals
+
+## 1.8.11
+
+### Patch Changes
+
+- 1ec67f15: fix #2028, fix #2029 revert spread value bypass, and guard multi-text
+
+## 1.8.10
+
+### Patch Changes
+
+- 169d23b4: fix disposal timing when streaming
+
+## 1.8.9
+
+### Patch Changes
+
+- 80d4830f: fix #2016 value spread, smaller build output
+- 918586fb: fix #2017 object replacing array in `reconcile`
+- 71bea784: fix #1971 order of merged properties
+- b0862d39: fix #2014 html not replaced when resource resolves next `tick`
+- cbc8d3ee: remove seroval plugins from build output
+
+## 1.8.8
+
+### Patch Changes
+
+- 40b5d78d: chore(types): return mapped type for splitProps excluded `other` value
+- 968e2cc9: update seroval, fix #1972, fix #1980, fix #2002, support partial ALS
+- 292aba41: fix #1982 ErrorBoundary with ExternalSource
+- 7e5667ab: fix #1998 Switch relying on order
+- 8d2de12f: fix #1850 untrack in external source
+- b887587a: fix #1973 array over object reconcile
+
+## 1.8.7
+
+### Patch Changes
+
+- 22667bbc: fix: createSignal not found when bundled
+- e09a3cc3: fix timing issue with deferStream
+
+## 1.8.6
+
+### Patch Changes
+
+- 2b320376: Add types directory export for each package
+- fb7f4bc1: fix #1950 leaking error tracking
+- b092368c: feat(DEV): Add afterCreateSignal hook to DevHooks
+- 54e1aecf: update seroval, fix this, optimize star imports, fix #1952 hydration race condition
+
+## 1.8.5
+
+### Patch Changes
+
+- 80ca972f: fix `onHydrate` call being skipped
+
+## 1.8.4
+
+### Patch Changes
+
+- cf0542a4: fix #1927, fix #1929, fix #1931, update storage API
+- 3f3a3396: serialization error handling, experimental async storage
+
+## 1.8.3
+
+### Patch Changes
+
+- 1f0226e1: fix #1917 for real this time
+
+## 1.8.2
+
+### Patch Changes
+
+- b632dfd5: Add missing `indexArray` to server-side runtime.
+- dd492c5e: fix #1917, fix #1918 error handling with serialization
+- 4968fe26: Add `.js` extension to import
+
 ## 1.8.1
 
 ### Patch Changes

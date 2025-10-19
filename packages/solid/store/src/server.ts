@@ -1,5 +1,19 @@
 import type { SetStoreFunction, Store } from "./store.js";
 
+export type {
+  ArrayFilterFn,
+  DeepMutable,
+  DeepReadonly,
+  NotWrappable,
+  Part,
+  SetStoreFunction,
+  SolidStore,
+  Store,
+  StoreNode,
+  StorePathRange,
+  StoreSetter
+} from "./store.js";
+
 export const $RAW = Symbol("state-raw");
 
 export function isWrappable(obj: any) {
@@ -101,6 +115,10 @@ export function createStore<T>(state: T | Store<T>): [Store<T>, SetStoreFunction
 
 export function createMutable<T>(state: T | Store<T>): T {
   return state as T;
+}
+
+export function modifyMutable<T>(state: T, modifier: (state: T) => T) {
+  modifier(state);
 }
 
 type ReconcileOptions = {

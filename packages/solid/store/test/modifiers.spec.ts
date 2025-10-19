@@ -1,5 +1,14 @@
-import { createRoot, createSignal, createEffect } from "../../src";
-import { createStore, createMutable, reconcile, produce, unwrap, modifyMutable } from "../src";
+import { describe, expect, test } from "vitest";
+
+import { createRoot, createSignal, createEffect } from "../../src/index.js";
+import {
+  createStore,
+  createMutable,
+  reconcile,
+  produce,
+  unwrap,
+  modifyMutable
+} from "../src/index.js";
 
 describe("setState with reconcile", () => {
   test("Reconcile a simple object", () => {
@@ -133,6 +142,28 @@ describe("setState with reconcile", () => {
     setStore(reconcile({}));
     expect(store.id).toBe(undefined);
     expect(store.value).toBe(undefined);
+  });
+
+  test("Reconcile overwrite an object with an array", () => {
+    const [store, setStore] = createStore<{ value: {} | [] }>({
+      value: { a: { b: 1 } }
+    });
+
+    setStore(reconcile({ value: { c: [1, 2, 3] } }));
+    expect(store.value).toEqual({ c: [1, 2, 3] });
+  });
+
+  test("Reconcile overwrite an array with an object", () => {
+    const [store, setStore] = createStore<{ value: {} | [] }>({
+      value: [1, 2, 3]
+    });
+    setStore(reconcile({ value: { name: "John" } }));
+    expect(Array.isArray(store.value)).toBeFalsy();
+    expect(store.value).toEqual({ name: "John" });
+    setStore(reconcile({ value: [1, 2, 3] }));
+    expect(store.value).toEqual([1, 2, 3]);
+    setStore(reconcile({ value: { q: "aa" } }));
+    expect(store.value).toEqual({ q: "aa" });
   });
 });
 

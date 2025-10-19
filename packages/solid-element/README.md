@@ -8,7 +8,7 @@ This library extends [Solid](https://github.com/solidjs/solid) by adding Custom 
 
 ## Example
 
-[See here](https://webcomponents.dev/edit/yGRb00wV4AMncPupRmA9) for an example of a webcomponent created by `solid-element`.
+[See here](./sample.jsx) for an example of a webcomponent created by `solid-element`.
 
 ## Installation
 
@@ -40,6 +40,17 @@ Props get assigned as element properties and hyphenated attributes. This exposes
 ```
 
 This is all you need to get started with Solid Element.
+
+A shadow DOM is used by default for style isolation. If you want to disable the shadow DOM, you can do it with `noShadowDOM()` like this:
+
+```jsx
+import { customElement, noShadowDOM } from 'solid-element';
+
+customElement('my-component', {someProp: 'one', otherProp: 'two'}, (props, { element }) => {
+  noShadowDOM();
+  // ... Solid code
+})
+```
 
 ## Examples
 

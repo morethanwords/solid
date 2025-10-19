@@ -34,14 +34,14 @@ export type ObservableObserver<T> =
       complete?: (v: boolean) => void;
     };
 /**
- * creates a simple observable from a signal's accessor to be used with the `from` operator of observable libraries like e.g. rxjs
+ * Creates a simple observable from a signal's accessor to be used with the `from` operator of observable libraries like e.g. rxjs
  * ```typescript
  * import { from } from "rxjs";
  * const [s, set] = createSignal(0);
  * const obsv$ = from(observable(s));
  * obsv$.subscribe((v) => console.log(v));
  * ```
- * description https://www.solidjs.com/docs/latest/api#observable
+ * description https://docs.solidjs.com/reference/reactive-utilities/observable
  */
 export function observable<T>(input: Accessor<T>): Observable<T> {
   return {
@@ -84,12 +84,17 @@ export function observable<T>(input: Accessor<T>): Observable<T> {
   };
 }
 
+type Producer<T> =
+  | ((setter: Setter<T>) => () => void)
+  | { subscribe: (fn: (v: T) => void) => (() => void) | { unsubscribe: () => void } };
+
+export function from<T>(producer: Producer<T>, initalValue: T): Accessor<T>;
+export function from<T>(producer: Producer<T | undefined>): Accessor<T | undefined>;
 export function from<T>(
-  producer:
-    | ((setter: Setter<T | undefined>) => () => void)
-    | { subscribe: (fn: (v: T) => void) => (() => void) | { unsubscribe: () => void } }
+  producer: Producer<T | undefined>,
+  initalValue: T | undefined = undefined
 ): Accessor<T | undefined> {
-  const [s, set] = createSignal<T | undefined>(undefined, { equals: false });
+  const [s, set] = createSignal<T | undefined>(initalValue, { equals: false });
   if ("subscribe" in producer) {
     const unsub = producer.subscribe(v => set(() => v));
     onCleanup(() => ("unsubscribe" in unsub ? unsub.unsubscribe() : unsub()));

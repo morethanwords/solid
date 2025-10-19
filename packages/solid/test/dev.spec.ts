@@ -1,3 +1,4 @@
+import { describe, expect, test, vi } from "vitest";
 import {
   createRoot,
   getOwner,
@@ -7,9 +8,9 @@ import {
   DEV,
   createContext,
   createComponent
-} from "../src";
-import type { DevComponent } from "../src/reactive/signal";
-import { createStore, unwrap, DEV as STORE_DEV } from "../store/src";
+} from "../src/index.js";
+import type { DevComponent } from "../src/reactive/signal.js";
+import { createStore, unwrap, DEV as STORE_DEV } from "../store/src/index.js";
 
 describe("Dev features", () => {
   test("Signals being added to sourceMap with user-provided names", () => {
@@ -126,6 +127,34 @@ describe("Dev features", () => {
         expect(cb).toHaveBeenCalledTimes(3);
         expect(cb).toHaveBeenLastCalledWith(getOwner());
       });
+    });
+  });
+
+  test("afterRegisterGraph Hook", () => {
+    createRoot(() => {
+      const owner = getOwner()!;
+      const cb = vi.fn();
+      DEV!.hooks.afterRegisterGraph = cb;
+
+      createSignal(1);
+      expect(cb).toHaveBeenCalledTimes(1);
+      expect(cb).toHaveBeenLastCalledWith(owner.sourceMap![0]);
+      expect(owner.sourceMap).toHaveLength(1);
+
+      createSignal(2, { internal: true });
+      expect(cb).toHaveBeenCalledTimes(1);
+      expect(owner.sourceMap).toHaveLength(1);
+
+      createStore({});
+      expect(cb).toHaveBeenCalledTimes(2);
+      expect(cb).toHaveBeenLastCalledWith(owner.sourceMap![1]);
+      expect(owner.sourceMap).toHaveLength(2);
+
+      const customValue = { value: 3 };
+      DEV!.registerGraph(customValue);
+      expect(cb).toHaveBeenCalledTimes(3);
+      expect(cb).toHaveBeenLastCalledWith(customValue);
+      expect(owner.sourceMap).toHaveLength(3);
     });
   });
 

@@ -25,12 +25,12 @@ interface SuspenseListState extends Array<SuspenseListRegisteredState> {
 
 const suspenseListEquals = (a: SuspenseListRegisteredState, b: SuspenseListRegisteredState) =>
   a.showContent === b.showContent && a.showFallback === b.showFallback;
-const SuspenseListContext = createContext<SuspenseListContextType>();
+const SuspenseListContext = /* #__PURE__ */ createContext<SuspenseListContextType>();
 
 /**
- * **[experimental]** controls the order in which suspended content is rendered
+ * **[experimental]** Controls the order in which suspended content is rendered
  *
- * @description https://www.solidjs.com/docs/latest/api#suspenselist-experimental
+ * @description https://docs.solidjs.com/reference/components/suspense-list
  */
 export function SuspenseList(props: {
   children: JSX.Element;
@@ -110,7 +110,7 @@ export function SuspenseList(props: {
 }
 
 /**
- * tracks all resources inside a component and renders a fallback until they are all resolved
+ * Tracks all resources inside a component and renders a fallback until they are all resolved
  * ```typescript
  * const AsyncComponent = lazy(() => import('./component'));
  *
@@ -118,7 +118,7 @@ export function SuspenseList(props: {
  *   <AsyncComponent />
  * </Suspense>
  * ```
- * @description https://www.solidjs.com/docs/latest/api#suspense
+ * @description https://docs.solidjs.com/reference/components/suspense
  */
 export function Suspense(props: { fallback?: JSX.Element; children: JSX.Element }) {
   let counter = 0,
@@ -142,23 +142,28 @@ export function Suspense(props: { fallback?: JSX.Element; children: JSX.Element 
     },
     owner = getOwner();
   if (sharedConfig.context && sharedConfig.load) {
-    const key = sharedConfig.context.id + sharedConfig.context.count;
+    const key = sharedConfig.getContextId();
     let ref = sharedConfig.load(key);
-    if (ref && (typeof ref !== "object" || !("value" in ref))) p = ref;
+    if (ref) {
+      if (typeof ref !== "object" || ref.s !== 1) p = ref;
+      else sharedConfig.gather!(key);
+    }
     if (p && p !== "$$f") {
       const [s, set] = createSignal(undefined, { equals: false });
       flicker = s;
-      p.then(() => {
-        sharedConfig.gather!(key);
-        setHydrateContext(ctx);
-        set();
-        setHydrateContext();
-      }).catch((err: any) => {
-        if (err || sharedConfig.done) {
-          err && (error = err);
-          return set();
+      p.then(
+        () => {
+          if (sharedConfig.done) return set();
+          sharedConfig.gather!(key);
+          setHydrateContext(ctx);
+          set();
+          setHydrateContext();
+        },
+        (err: any) => {
+          error = err;
+          set();
         }
-      });
+      );
     }
   }
 
@@ -195,7 +200,7 @@ export function Suspense(props: { fallback?: JSX.Element; children: JSX.Element 
           return createRoot(disposer => {
             dispose = disposer;
             if (ctx) {
-              setHydrateContext({ id: ctx.id + "f", count: 0 });
+              setHydrateContext({ id: ctx.id + "F", count: 0 });
               ctx = undefined;
             }
             return props.fallback;

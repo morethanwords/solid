@@ -2,13 +2,13 @@
  * @jsxImportSource solid-js
  * @vitest-environment jsdom
  */
-
-import { createRoot, createSignal, Component, JSX } from "../../src";
-import { createStore } from "../../store/src";
-import { Dynamic } from "../src";
+import { describe, expect, test, beforeEach, afterEach } from "vitest";
+import { createRoot, createSignal, Component, JSX } from "../../src/index.js";
+import { createStore } from "../../store/src/index.js";
+import { Dynamic } from "../src/index.js";
 
 describe("Testing Dynamic control flow", () => {
-  let div: HTMLDivElement, disposer: () => void;
+  let div!: HTMLDivElement, disposer: () => void;
 
   interface ExampleProps {
     id: string;
@@ -56,7 +56,7 @@ describe("Testing Dynamic control flow", () => {
 });
 
 describe("Testing Dynamic with state spread", () => {
-  let div: HTMLDivElement, disposer: () => void;
+  let div!: HTMLDivElement, disposer: () => void;
 
   interface ExampleProps {
     id: string;

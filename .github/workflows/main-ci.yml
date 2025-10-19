@@ -13,11 +13,12 @@ jobs:
   runs-on: ubuntu-latest
   steps:
   - uses: actions/checkout@v4
-  - uses: pnpm/action-setup@v2
-  - uses: actions/setup-node@v3
+  - uses: pnpm/action-setup@v4
+  - uses: actions/setup-node@v4
     with:
-      node-version: 18
-      cache: 'pnpm'
+      node-version-file: ".nvmrc"
+      registry-url: "https://registry.npmjs.org"
+      cache: "pnpm"
 
   - name: Installing deps
     run: pnpm install
@@ -31,14 +32,14 @@ jobs:
       pnpm run coverage
 
   - name: Coveralls
-    uses: coverallsapp/github-action@master
+    uses: coverallsapp/github-action@v2
     with:
       base-path: packages/solid
       path-to-lcov: "./packages/solid/coverage/lcov.info"
       github-token: ${{ secrets.GITHUB_TOKEN }}
 
   - name: Archive production artifacts
-    uses: actions/upload-artifact@v2
+    uses: actions/upload-artifact@v4
     with:
       name: dist-folder
       path: |

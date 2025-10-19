@@ -1,4 +1,5 @@
-import { createRoot, createSignal, createMemo, Accessor } from "../src";
+import { describe, expect, it } from "vitest";
+import { createRoot, createSignal, createMemo, Accessor } from "../src/index.js";
 
 describe("createMemo", () => {
   describe("executing propagating", () => {
@@ -33,7 +34,7 @@ describe("createMemo", () => {
           ),
           c1 = createMemo(
             () => {
-              b1(), b2();
+              (b1(), b2());
               seq += "c1";
             },
             undefined,
